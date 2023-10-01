@@ -12,14 +12,14 @@ spring:
         show_sql: true
         hibernate:
             ddl-auto: create
-        generate-ddl: true
-
-
-#        format_sql: true
+        properties:
+            format_sql: true
 #        default_batch_fetch_size: 1000 #??? ??
 
-#logging.level:
-#    org.hibernate.SQL: debug
-##  org.hibernate.type: trace
+logging.level:
+        org.hibernate.SQL: debug
+        org.hibernate.type: trace
+#    org.springframework: debug
+#    org.springframework.web: debug
 server:
     port: 8888

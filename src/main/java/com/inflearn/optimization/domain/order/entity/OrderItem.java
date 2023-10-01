@@ -28,4 +28,25 @@ public class OrderItem {
 
     @Column(nullable = false)
     private int count;
+
+    /**
+     * 생성 메소드
+     */
+    public static OrderItem createOrderItem(Item item, int orderPrice, int count) throws Exception {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(item);
+        orderItem.setOrderPrice(orderPrice);
+        orderItem.setCount(count);
+
+        item.removeStock(count);
+        return orderItem;
+    }
+
+    public void cancel() {
+        getItem().addStock(count); // 주문양만큼 되돌리기
+    }
+
+    public int getTotalPrice() {
+        return getOrderPrice() * getCount();
+    }
 }
