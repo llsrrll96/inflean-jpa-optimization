@@ -48,34 +48,34 @@ public class OrderItemApiController {
      * Entity를 api로 노출한 것은 지양
      */
     @GetMapping("/api/v1/simple-orders")
-    public ResponseEntity<Result> ordersV1() {
+    public ResponseEntity<Result<List<Order>>> ordersV1() {
         List<Order> all = repository.findAllByString(new OrderSearch());
         for (Order order : all) {
             order.getMember().getName(); // getMember 까지는 프록시객체(SQL 안날라감)
             order.getDelivery().getAddress();// getName(): Lazy 강제 초기화
         }
-        Result result = new Result<>(all.size(), all);
+        Result<List<Order>> result = new Result<>(all.size(), all);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/api/v2/simple-orders")
-    public ResponseEntity<Result> ordersV2() {
+    public ResponseEntity<Result<List<SimpleOrderDto>>> ordersV2() {
 
         List<Order> orders = repository.findAllByString(new OrderSearch());
 
         List<SimpleOrderDto> result = orders.stream()
                 .map(o -> new SimpleOrderDto(o))
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(new Result(result.size(), result));
+        return ResponseEntity.ok(new Result<>(result.size(), result));
     }
 
     @GetMapping("/api/v3/simple-orders")
-    public ResponseEntity<Result> ordersV3() {
+    public ResponseEntity<Result<List<SimpleOrderDto>>> ordersV3() {
         List<Order> orders = repository.findAllWithMemberDelivery();
         List<SimpleOrderDto> result = orders.stream()
                 .map(o -> new SimpleOrderDto(o))
                 .toList(); // Java 16부터 도입된 새로운 스트림 API 메서드입니다.
-        return ResponseEntity.ok(new Result(result.size(), result));
+        return ResponseEntity.ok(new Result<>(result.size(), result));
     }
 
     @Data
