@@ -23,6 +23,8 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+    // = new ProxyMember()를 생성해서(하이버네이트에서) 넣어둔다.
+    // = new ByteBuddyInterceptor() (프록시 기술)
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();

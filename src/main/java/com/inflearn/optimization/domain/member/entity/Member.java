@@ -1,5 +1,6 @@
 package com.inflearn.optimization.domain.member.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.inflearn.optimization.domain.order.entity.Order;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,6 +23,7 @@ public class Member {
     @Embedded
     private Address address;
 
+    @JsonIgnore // 양방향 연관관계 무한루프 방지
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 
