@@ -1,4 +1,4 @@
-package com.inflearn.optimization.domain.order;
+package com.inflearn.optimization.domain.order.repository;
 
 
 import com.inflearn.optimization.domain.order.dto.OrderSearch;
@@ -12,6 +12,9 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 순수한 엔티티 조회 용도
+ */
 @Repository
 public class OrderRepository {
 
@@ -104,7 +107,9 @@ public class OrderRepository {
                         " JOIN FETCH o.delivery d", Order.class)
                 .getResultList();
     }
-//
+
+
+// 사용 예정
 //    public List<Order> findAllWithItem() {
 //        return em.createQuery(
 //                        "select distinct o from Order o" +

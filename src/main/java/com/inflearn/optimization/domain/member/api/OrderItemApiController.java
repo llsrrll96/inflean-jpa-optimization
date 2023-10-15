@@ -4,10 +4,12 @@ import com.inflearn.optimization.application.Result;
 import com.inflearn.optimization.domain.member.dto.MemberOrderItemDto;
 import com.inflearn.optimization.domain.member.entity.Address;
 import com.inflearn.optimization.domain.member.service.OrderItemService;
-import com.inflearn.optimization.domain.order.OrderRepository;
 import com.inflearn.optimization.domain.order.dto.OrderSearch;
 import com.inflearn.optimization.domain.order.entity.Order;
 import com.inflearn.optimization.domain.order.entity.OrderStatus;
+import com.inflearn.optimization.domain.order.repository.OrderRepository;
+import com.inflearn.optimization.domain.order.simpleOrderQuery.SimpleOrderQueryDto;
+import com.inflearn.optimization.domain.order.simpleOrderQuery.SimpleOrderQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ public class OrderItemApiController {
     private final OrderItemService orderItemService;
 
     private final OrderRepository repository;
+    private final SimpleOrderQueryRepository simpleOrderQueryRepository;
 
     @PostMapping("/api/v1/myOrders")
     public ResponseEntity<Result<List<MemberOrderItemDto>>> getMyOrders(@RequestBody HashMap<String, Object> params) {
@@ -49,7 +52,7 @@ public class OrderItemApiController {
      */
     @GetMapping("/api/v1/simple-orders")
     public ResponseEntity<Result<List<Order>>> ordersV1() {
-        List<Order> all = repository.findAllByString(new OrderSearch());
+        List<Order> all = repository.findAllByString(new OrderSearch()); // service 생략
         for (Order order : all) {
             order.getMember().getName(); // getMember 까지는 프록시객체(SQL 안날라감)
             order.getDelivery().getAddress();// getName(): Lazy 강제 초기화
@@ -61,7 +64,7 @@ public class OrderItemApiController {
     @GetMapping("/api/v2/simple-orders")
     public ResponseEntity<Result<List<SimpleOrderDto>>> ordersV2() {
 
-        List<Order> orders = repository.findAllByString(new OrderSearch());
+        List<Order> orders = repository.findAllByString(new OrderSearch()); // service 생략
 
         List<SimpleOrderDto> result = orders.stream()
                 .map(o -> new SimpleOrderDto(o))
@@ -71,7 +74,7 @@ public class OrderItemApiController {
 
     @GetMapping("/api/v3/simple-orders")
     public ResponseEntity<Result<List<SimpleOrderDto>>> ordersV3() {
-        List<Order> orders = repository.findAllWithMemberDelivery();
+        List<Order> orders = repository.findAllWithMemberDelivery(); // service 생략
         List<SimpleOrderDto> result = orders.stream()
                 .map(o -> new SimpleOrderDto(o))
                 .toList(); // Java 16부터 도입된 새로운 스트림 API 메서드입니다.
@@ -93,5 +96,16 @@ public class OrderItemApiController {
             orderStatus = order.getStatus();
             address = order.getDelivery().getAddress();
         }
+    }
+
+    /**
+     * V4. JPA에서 DTO로 바로 조회
+     * - 쿼리 1번 호출
+     * - select 절에서 원하는 데이터만 선택해서 조회
+     */
+    @GetMapping("/api/v4/simple-orders")
+    public ResponseEntity<Result<List<SimpleOrderQueryDto>>> ordersV4() {
+        List<SimpleOrderQueryDto> orderDtos = simpleOrderQueryRepository.findOrderDtos(); // service 생략
+        return ResponseEntity.ok(new Result<>(orderDtos.size(), orderDtos));
     }
 }
