@@ -108,27 +108,26 @@ public class OrderRepository {
                 .getResultList();
     }
 
+    public List<Order> findAllWithItem() {
+       return em.createQuery(
+               "SELECT distinct o from Order o " + //  distinct : 엔티티 중복시 엔티티를 걸러서 컬렉션에 담아준다.
+                       " JOIN FETCH o.member m" +          // ToOne (페치조인)
+                       " JOIN FETCH o.delivery d" +        // ToOne (페치조인)
+                       " JOIN FETCH o.orderItems oi" +     // ToMany
+                       " JOIN FETCH oi.item i", Order.class)
+               .getResultList();
+    }
 
-// 사용 예정
-//    public List<Order> findAllWithItem() {
-//        return em.createQuery(
-//                        "select distinct o from Order o" +
-//                                " join fetch o.member m" +
-//                                " join fetch o.delivery d" +
-//                                " join fetch o.orderItems oi" +
-//                                " join fetch oi.item i", Order.class)
-//                .getResultList();
-//    }
-//
-//    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
-//        return em.createQuery(
-//                        "select o from Order o" +
-//                                " join fetch o.member m" +
-//                                " join fetch o.delivery d", Order.class)
-//                .setFirstResult(offset)
-//                .setMaxResults(limit)
-//                .getResultList();
-//    }
+    public List<Order> findAllWithMemberDelivery(String offset, String limit) {
+        return em.createQuery(
+                        "SELECT o FROM Order o" +
+                                " JOIN FETCH o.member m" +
+                                " JOIN FETCH o.delivery d", Order.class)
+                .setFirstResult(Integer.parseInt(offset))
+                .setMaxResults(Integer.parseInt(limit))
+                .getResultList();
+                // SELECT o FROM Order o
+    }
 }
 
 

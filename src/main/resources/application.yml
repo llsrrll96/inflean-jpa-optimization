@@ -18,12 +18,16 @@ spring:
         properties:
             hibernate:
                 format_sql: true
-#        default_batch_fetch_size: 1000 #??? ??
+                default_batch_fetch_size: 100 # ToMany 관계 페이징 + 성능최적화 ( where in 으로 조건 쿼리)
 
 
 logging.level:
-        org.hibernate.SQL: debug
-        org.hibernate.type: trace
+    org.hibernate:
+        SQL: debug
+        type: trace
+#logging.level:
+#        org.hibernate.SQL: debug
+#        org.hibernate.type.descriptor.sql: trace
 #    org.springframework: debug
 #    org.springframework.web: debug
 server:

@@ -8,4 +8,8 @@ import lombok.Data;
 public class Result<T> {
     int count;
     private T data;
+
+    public Result(T data) {
+        this.data = data;
+    }
 }

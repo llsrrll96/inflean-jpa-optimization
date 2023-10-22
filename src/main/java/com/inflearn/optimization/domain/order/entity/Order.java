@@ -5,11 +5,13 @@ import com.inflearn.optimization.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@BatchSize(size = 1000) // ToOne관계에 대한 batch size
 @Entity
 @Table(name = "orders")
 @Getter
@@ -26,6 +28,7 @@ public class Order {
     // = new ProxyMember()를 생성해서(하이버네이트에서) 넣어둔다.
     // = new ByteBuddyInterceptor() (프록시 기술)
 
+    @BatchSize(size = 1000) // 개별 batch size 설정 (in 조건)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 

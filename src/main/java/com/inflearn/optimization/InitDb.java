@@ -1,6 +1,7 @@
 package com.inflearn.optimization;
 
 import com.inflearn.optimization.domain.delivery.entity.Delivery;
+import com.inflearn.optimization.domain.delivery.entity.DeliveryStatus;
 import com.inflearn.optimization.domain.item.items.entity.Book;
 import com.inflearn.optimization.domain.member.entity.Address;
 import com.inflearn.optimization.domain.member.entity.Member;
@@ -83,6 +84,7 @@ public class InitDb {
         private Delivery createDelivery(Member member) {
             Delivery delivery = new Delivery();
             delivery.setAddress(member.getAddress());
+            delivery.setStatus(DeliveryStatus.READY);
             return delivery;
         }
     }
