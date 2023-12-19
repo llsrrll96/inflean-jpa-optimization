@@ -28,13 +28,13 @@ public class Order {
     // = new ProxyMember()를 생성해서(하이버네이트에서) 넣어둔다.
     // = new ByteBuddyInterceptor() (프록시 기술)
 
-    @BatchSize(size = 1000) // 개별 batch size 설정 (in 조건)
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems = new ArrayList<>();
-
     @OneToOne(fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
+
+    @BatchSize(size = 1000) // 개별 batch size 설정 (in 조건)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     private LocalDateTime orderDate;
 
