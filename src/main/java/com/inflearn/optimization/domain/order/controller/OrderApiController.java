@@ -7,9 +7,12 @@ import com.inflearn.optimization.domain.order.entity.Order;
 import com.inflearn.optimization.domain.order.entity.OrderItem;
 import com.inflearn.optimization.domain.order.entity.OrderStatus;
 import com.inflearn.optimization.domain.order.repository.OrderRepository;
+import com.inflearn.optimization.domain.order.repository.query.OrderFlatDto;
+import com.inflearn.optimization.domain.order.repository.query.OrderItemQueryDto;
+import com.inflearn.optimization.domain.order.repository.query.OrderQueryDto;
+import com.inflearn.optimization.domain.order.repository.query.OrderQueryRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,10 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.util.stream.Collectors.*;
+
 @RestController
 @RequiredArgsConstructor
 public class OrderApiController {
     private final OrderRepository repository;
+    private final OrderQueryRepository queryRepository;
 
     @GetMapping("/api/v1/orders")
     public ResponseEntity<Result<List<Order>>> ordersV1() {
@@ -79,6 +85,43 @@ public class OrderApiController {
         return ResponseEntity.ok(new Result<>(result));
     }
 
+    /**
+     * forEach 반복 조회
+     */
+    @GetMapping("/api/v4/orders")
+    public ResponseEntity<Result<List<OrderQueryDto>>> orderV4() {
+        List<OrderQueryDto> orderQueryDtos = queryRepository.findOrderQueryDtos();
+        return ResponseEntity.ok(new Result<>(orderQueryDtos));
+    }
+
+    /**
+     * IN 쿼리 사용
+     */
+    @GetMapping("/api/v5/orders")
+    public ResponseEntity<Result<List<OrderQueryDto>>> orderV5() {
+        List<OrderQueryDto> orderQueryDtos = queryRepository.findAllByDto_optimization();
+        return ResponseEntity.ok(new Result<>(orderQueryDtos));
+    }
+
+    /**
+     * 한번 조회
+     */
+    @GetMapping("/api/v6/orders")
+    public ResponseEntity<Result<List<OrderQueryDto>>> orderV6() {
+        List<OrderFlatDto> orderFlatDtos = queryRepository.findAllByDto_flat();
+        List<OrderQueryDto> orderQueryDtos = orderFlatDtos.stream()
+                .collect(groupingBy(o -> new OrderQueryDto(o.getOrderId(),
+                                o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        mapping(o -> new OrderItemQueryDto(o.getOrderId(),
+                                o.getItemName(), o.getOrderPrice(), o.getCount()), toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(),
+                        e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(),
+                        e.getKey().getAddress(), e.getValue()))
+                .collect(toList());
+        return ResponseEntity.ok(new Result<>(orderQueryDtos));
+    }
+
     @Getter
     static class OrderDto {
         private Long orderId;
@@ -102,7 +145,6 @@ public class OrderApiController {
 
     @Getter
     static class OrderItemDto {
-
         private String itemName;
         private int orderPrice;
         private int count;
